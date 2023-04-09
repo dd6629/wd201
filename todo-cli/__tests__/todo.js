@@ -1,6 +1,5 @@
 const todoList = require("../todo");
 const { all, markAsComplete, add, overdue, dueToday, dueLater } = todoList();
-
 describe("TodoList Test Suite", () => {
   const yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
     .toISOString()
