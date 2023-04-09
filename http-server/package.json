@@ -1,0 +1,17 @@
+{
+  "name": "http-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Divya <divya.dha24@gmail.com>",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "eslint": "^8.36.0",
+    "minimist": "^1.2.8",
+    "start": "^5.1.0"
+  }
+}
