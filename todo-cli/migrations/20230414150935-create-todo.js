@@ -32,3 +32,5 @@ module.exports = {
     await queryInterface.dropTable("Todos");
   },
 };
+natho not talking kadha ok bye i hurt
+matladhaku natho
