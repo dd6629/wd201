@@ -37,12 +37,12 @@
           class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50"
         >
           <input
-            id="todo-checkbox-1"
+            id="past-checkbox-<%= i %>"
             type="checkbox"
             class="w-4 h-4 text-blue-600 bg-gray-100 rounded border"
           />
           <label
-            for="todo-checkbox-1"
+            for="past-checkbox-<%= i %>"
             class="ml-2 text-sm text-gray-600 cursor-pointer"
             ><%= past[i].title %></label
           >
@@ -77,12 +77,12 @@
           class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50"
         >
           <input
-            id="todo-checkbox-3"
+            id="present-checkbox-<%= i %>"
             type="checkbox"
             class="w-4 h-4 text-blue-600 bg-gray-100 rounded border"
           />
           <label
-            for="todo-checkbox-3"
+            for="present-checkbox-<%= i %>"
             class="ml-2 text-sm text-gray-600 cursor-pointer"
             ><%= present[i].title %></label
           >
@@ -118,12 +118,12 @@
           class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50"
         >
           <input
-            id="todo-checkbox-5"
+            id="future-checkbox-<%= i %>"
             type="checkbox"
             class="w-4 h-4 text-blue-600 bg-gray-100 rounded border"
           />
           <label
-            for="todo-checkbox-5"
+            for="future-checkbox-<%= i %>"
             class="ml-2 text-sm text-gray-600 cursor-pointer"
             ><%= future[i].title %></label
           >
