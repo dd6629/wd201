@@ -2,6 +2,8 @@
 const {
   Model
 } = require('sequelize');
+const moment = require('moment');
+const { Op } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
     /**
@@ -16,6 +18,40 @@ module.exports = (sequelize, DataTypes) => {
     static addTodo({ title, dueDate }) {
       return this.create({ title: title, dueDate: dueDate, completed: false})
     }
+
+    static getTodos() {
+      return this.findAll();
+    }
+
+    static pastTodos() {
+      return this.findAll({
+          where: {
+              dueDate: {
+                  [Op.lt]:moment().toDate()
+              }
+          }
+      })
+  }
+
+  static presentTodos() {
+      return this.findAll({
+          where: {
+              dueDate: {
+                  [Op.eq]: moment().toDate()
+              }
+          }
+      })
+  }
+
+  static futureTodos() {
+      return this.findAll({
+          where: {
+              dueDate: {
+                  [Op.gt]: moment().toDate()
+              }
+          }
+      })
+  }
 
     markAsCompleted(){
       return this.update({ completed: true})
