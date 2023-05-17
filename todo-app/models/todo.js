@@ -23,39 +23,73 @@ module.exports = (sequelize, DataTypes) => {
       return this.findAll();
     }
 
-    static pastTodos() {
+    static overdueTodos() {
       return this.findAll({
           where: {
               dueDate: {
                   [Op.lt]:moment().toDate()
-              }
+              },
+              completed:{
+              [Op.eq]:false,
+              },
           }
       })
   }
 
-  static presentTodos() {
+  static todayTodos() {
       return this.findAll({
           where: {
               dueDate: {
                   [Op.eq]: moment().toDate()
-              }
+              },
+              completed: {
+                [Op.eq]: false,
+              },
           }
       })
   }
 
-  static futureTodos() {
+  static laterTodos() {
       return this.findAll({
           where: {
               dueDate: {
                   [Op.gt]: moment().toDate()
-              }
+              },
+              completed: {
+                [Op.eq]: false,
+              },
           }
       })
   }
 
-    markAsCompleted(){
-      return this.update({ completed: true})
+  static allCompletedTodos(){
+    return this.findAll({
+      where: {
+        completed: {
+          [Op.eq]: true,
+        },
+      },
+    });
+  }
+
+  static async remove(id){
+    return this.destroy({
+      where: {
+        id,
+      },
+    });
+  }
+
+  setCompletionStatus(bool){
+    if (bool) {
+      return this.update({ completed: true });
+    } else {
+      return this.update({ completed: false });
     }
+  }
+
+
+   
   }
   Todo.init({
     title: DataTypes.STRING,

@@ -1,14 +1,26 @@
+/* eslint-disable no-undef */
+
 const request = require("supertest");
+const cheerio = require("cheerio");
 
 const db = require("../models/index");
 const app = require("../app");
 
+const moment = require("moment")
+const date=moment()
+
 let server, agent;
+
+const extractCSRF = (html) => {
+  const $ = cheerio.load(html.text);
+  return $('[name="_csrf"]').val();
+};
+
 
 describe("Todo Application", function () {
   beforeAll(async () => {
     await db.sequelize.sync({ force: true });
-    server = app.listen(3000, () => {});
+    server = app.listen(3000, () => { });
     agent = request.agent(server);
   });
 
@@ -21,76 +33,65 @@ describe("Todo Application", function () {
     }
   });
 
-  test("Creates a todo and responds with json at /todos POST endpoint", async () => {
-    const response = await agent.post("/todos").send({
+  test("Create a new todo", async () => {
+    const response = await agent.get("/");
+    const csrfToken = extractCSRF(response);
+    const response1 = await agent.post("/todos").send({
       title: "Buy milk",
-      dueDate: new Date().toISOString(),
+      dueDate: date.format("YYYY-MM-DD"),
       completed: false,
+      _csrf: csrfToken,
     });
-    expect(response.statusCode).toBe(200);
-    expect(response.header["content-type"]).toBe(
-      "application/json; charset=utf-8"
-    );
-    const parsedResponse = JSON.parse(response.text);
-    expect(parsedResponse.id).toBeDefined();
+    expect(response1.statusCode).toBe(302);
   });
 
-  test("Marks a todo with the given ID as complete", async () => {
-    const response = await agent.post("/todos").send({
-      title: "Buy milk",
-      dueDate: new Date().toISOString(),
-      completed: false,
+  test("Update a given todo as complete", async () => {
+    const response = await agent.get("/");
+    const csrfToken = extractCSRF(response);
+    let $ = cheerio.load(response.text);
+    let completionStatus=$('input[type="checkbox"]').prop("checked");
+    expect(completionStatus).toBe(false);
+    const todoId=$('input[type="checkbox"]').attr("id");
+    await agent.put(`/todos/${todoId.split("-")[1]}`).send({
+      completed: true,
+      _csrf: csrfToken,
     });
-    const parsedResponse = JSON.parse(response.text);
-    const todoID = parsedResponse.id;
-
-    expect(parsedResponse.completed).toBe(false);
-
-    const markCompleteResponse = await agent
-      .put(`/todos/${todoID}/markASCompleted`)
-      .send();
-    const parsedUpdateResponse = JSON.parse(markCompleteResponse.text);
-    expect(parsedUpdateResponse.completed).toBe(true);
+    const response2=await agent.get("/")
+    $ = cheerio.load(response2.text);
+    completionStatus=$('input[type="checkbox"]').prop("checked");
+    expect(completionStatus).toBe(true);
   });
 
-  test("Fetches all todos in the database using /todos endpoint", async () => {
-    await agent.post("/todos").send({
-      title: "Buy xbox",
-      dueDate: new Date().toISOString(),
+  test("Update a given todo as in-complete", async () => {
+    const response = await agent.get("/");
+    const csrfToken = extractCSRF(response);
+    let $ = cheerio.load(response.text);
+    let completionStatus=$('input[type="checkbox"]').prop("checked");
+    expect(completionStatus).toBe(true);
+    const todoId=$('input[type="checkbox"]').attr("id");
+    await agent.put(`/todos/${todoId.split("-")[1]}`).send({
       completed: false,
+      _csrf: csrfToken,
     });
-    await agent.post("/todos").send({
-      title: "Buy ps3",
-      dueDate: new Date().toISOString(),
-      completed: false,
-    });
-    const response = await agent.get("/todos");
-    const parsedResponse = JSON.parse(response.text);
-console.log(parsedResponse);
-    expect(parsedResponse.length).toBe(4);
-    expect(parsedResponse[3]["title"]).toBe("Buy ps3");
+    const response2=await agent.get("/")
+    $ = cheerio.load(response2.text);
+    completionStatus=$('input[type="checkbox"]').prop("checked");
+    expect(completionStatus).toBe(false);
   });
 
-  test("Deletes a todo with the given ID if it exists and sends a boolean response", async () => {
-    const response = await agent.post("/todos").send({
-      title: "Buy headphones",
-      dueDate: new Date().toISOString(),
-      completed: false,
+  test("Delete a given todo ", async () => {
+    const response = await agent.get("/");
+    const csrfToken = extractCSRF(response);
+    let $ = cheerio.load(response.text);
+    let todoId=$('input[type="checkbox"]').attr("id");
+    expect(todoId.split("-")[1].length).toBe(1);
+    await agent.delete(`/todos/${todoId.split("-")[1]}`).send({
+      completed: true,
+      _csrf: csrfToken,
     });
-    const parsedResponse = JSON.parse(response.text);
-    const todoID = parsedResponse.id;
-
-    // Delete the todo
-    const deleteResponse = await agent.delete(`/todos/${todoID}`).send();
-    expect(deleteResponse.statusCode).toBe(200);
-    expect(deleteResponse.header["content-type"]).toBe(
-      "application/json; charset=utf-8"
-    );
-    const parsedDeleteResponse = JSON.parse(deleteResponse.text);
-    expect(parsedDeleteResponse).toBe(true);
-
-    // Try to fetch the deleted todo and make sure it's not found
-    const getResponse = await agent.get(`/todos/${todoID}`);
-    expect(getResponse.statusCode).toBe(200);
+    const response2=await agent.get("/")
+    $ = cheerio.load(response2.text);
+    todoId=$('input[type="checkbox"]').attr("id");
+    expect(todoId).toBe(undefined);
   });
 });
