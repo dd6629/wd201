@@ -6,3 +6,25 @@ body {
 .Todo-Item:hover .trash-icon {
     display: block;
 }
+
+
+
+.error-message,.success-message {
+    display: inline-block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.error-messages {
+    color: red;
+}
+
+.success-messages {
+    color: green;
+}
+

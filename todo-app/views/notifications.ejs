@@ -1,0 +1,16 @@
+<div class="notification">
+    <div class="error-messages">
+      <% if (messages && messages.error && messages.error.length > 0) { %>
+        <% messages.error.forEach(function(errorMsg) { %>
+          <p class="error-message"><%= errorMsg %></p>
+        <% }); %>
+      <% } %>
+    </div>
+    <div class="success-messages">
+      <% if (messages && messages.success && messages.success.length > 0) { %>
+        <% messages.success.forEach(function(successMsg) { %>
+          <p class="success-message"><%= successMsg %></p>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
